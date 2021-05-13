@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DFI | DronaMaps</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link
+      href="https://unpkg.com/material-components-web@6.0.0/dist/material-components-web.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <!--polygon drawing-->
+    <!--<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <style type="text/css">
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>-->
+    <!--<script>
+      // This example requires the Drawing library. Include the libraries=drawing
+      // parameter when you first load the API. For example:
+      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing">
+      function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: -34.397, lng: 150.644 },
+          zoom: 8,
+        });
+        const drawingManager = new google.maps.drawing.DrawingManager({
+          drawingMode: google.maps.drawing.OverlayType.MARKER,
+          drawingControl: true,
+          drawingControlOptions: {
+            position: google.maps.ControlPosition.TOP_CENTER,
+            drawingModes: [
+              google.maps.drawing.OverlayType.MARKER,
+              google.maps.drawing.OverlayType.CIRCLE,
+              google.maps.drawing.OverlayType.POLYGON,
+              google.maps.drawing.OverlayType.POLYLINE,
+              google.maps.drawing.OverlayType.RECTANGLE,
+            ],
+          },
+          markerOptions: {
+            icon:
+              "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
+          },
+          circleOptions: {
+            fillColor: "#ffff00",
+            fillOpacity: 1,
+            strokeWeight: 5,
+            clickable: false,
+            editable: true,
+            zIndex: 1,
+          },
+        });
+        drawingManager.setMap(map);
+      }
+    </script>-->
+
+    <!--geojson load-->
+    <style type="text/css">
+      html {
+        height: 100%;
+      }
+
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #map {
+        height: 100%;
+      }
+      #map.over {
+        opacity: 0.5;
+        background-color: rgba(100, 100, 100, 0.5);
+      }
+
+      #sidebar {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+      }
+
+      .file {
+        display: flex;
+        flex-flow: column;
+        margin-top: 1em;
+        cursor: move;
+        text-align: center;
+      }
+      .file:hover .material-icons {
+        color: darkorange;
+      }
+      .file:hover .filename {
+        font-weight: bold;
+      }
+      .file .material-icons {
+        font-size: 50px;
+        color: orange;
+      }
+      .file .material-icons:hover {
+        color: darkorange;
+      }
+      .file .filename {
+        margin-top: 0.5em;
+        font-size: 20px;
+        color: #333333;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #container {
+        height: 100%;
+        display: flex;
+      }
+
+      #sidebar {
+        flex-basis: 15rem;
+        flex-grow: 1;
+        padding: 1rem;
+        max-width: 20rem;
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+      }
+
+      #map {
+        flex-basis: 0;
+        flex-grow: 4;
+        height: 100%;
+      }
+    </style>
+    <script>
+      let map;
+
+      function initMap() {
+        // set up the map
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: new google.maps.LatLng(25.6457126,78.1228722),
+          zoom: 6,
+          // TERRAIN MAP
+          mapTypeId: "terrain",
+          // NIGHT MODE
+          /*
+          styles: [
+            { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+            {
+              elementType: "labels.text.stroke",
+              stylers: [{ color: "#242f3e" }],
+            },
+            {
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#746855" }],
+            },
+            {
+              featureType: "administrative.locality",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#d59563" }],
+            },
+            {
+              featureType: "poi",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#d59563" }],
+            },
+            {
+              featureType: "poi.park",
+              elementType: "geometry",
+              stylers: [{ color: "#263c3f" }],
+            },
+            {
+              featureType: "poi.park",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#6b9a76" }],
+            },
+            {
+              featureType: "road",
+              elementType: "geometry",
+              stylers: [{ color: "#38414e" }],
+            },
+            {
+              featureType: "road",
+              elementType: "geometry.stroke",
+              stylers: [{ color: "#212a37" }],
+            },
+            {
+              featureType: "road",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#9ca5b3" }],
+            },
+            {
+              featureType: "road.highway",
+              elementType: "geometry",
+              stylers: [{ color: "#746855" }],
+            },
+            {
+              featureType: "road.highway",
+              elementType: "geometry.stroke",
+              stylers: [{ color: "#1f2835" }],
+            },
+            {
+              featureType: "road.highway",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#f3d19c" }],
+            },
+            {
+              featureType: "transit",
+              elementType: "geometry",
+              stylers: [{ color: "#2f3948" }],
+            },
+            {
+              featureType: "transit.station",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#d59563" }],
+            },
+            {
+              featureType: "water",
+              elementType: "geometry",
+              stylers: [{ color: "#17263c" }],
+            },
+            {
+              featureType: "water",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#515c6d" }],
+            },
+            {
+              featureType: "water",
+              elementType: "labels.text.stroke",
+              stylers: [{ color: "#17263c" }],
+            },
+          ],
+          */
+        });
+
+        // add polygon drawing features
+        const drawingManager = new google.maps.drawing.DrawingManager({
+          drawingMode: null,//google.maps.drawing.OverlayType.MARKER,
+          drawingControl: true,
+          drawingControlOptions: {
+            position: google.maps.ControlPosition.TOP_CENTER,
+            drawingModes: [
+              google.maps.drawing.OverlayType.MARKER,
+              google.maps.drawing.OverlayType.CIRCLE,
+              google.maps.drawing.OverlayType.POLYGON,
+              google.maps.drawing.OverlayType.POLYLINE,
+              google.maps.drawing.OverlayType.RECTANGLE,
+            ],
+          },
+          markerOptions: {
+            icon:
+              "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
+          },
+          circleOptions: {
+            fillColor: "#ffff00",
+            fillOpacity: 0.3,
+            strokeWeight: 2,
+            clickable: false,
+            draggable: true,
+            editable: true,
+            zIndex: 1,
+          },
+        });
+        drawingManager.setMap(map);
+
+        // Elevation feature
+        const elevator = new google.maps.ElevationService();
+        const infowindow = new google.maps.InfoWindow({});
+        infowindow.open(map);
+        // Add a listener for the click event. Display the elevation for the LatLng of
+        // the click inside the infowindow.
+        map.addListener("click", (event) => {
+          displayLocationElevation(event.latLng, elevator, infowindow);
+        });
+      }
+
+      function loadGeoJsonString(geoString) {
+        try {
+          const geojson = JSON.parse(geoString);
+          map.data.addGeoJson(geojson);
+        } catch (e) {
+          alert("Not a GeoJSON file!");
+        }
+        zoom(map);
+      }
+
+      /**
+      * Display Elevation data upon click
+      */
+      function displayLocationElevation(location, elevator, infowindow) {
+        // Initiate the location request
+        elevator.getElevationForLocations(
+          {
+            locations: [location],
+          },
+          (results, status) => {
+            infowindow.setPosition(location);
+
+            if (status === "OK" && results) {
+              // Retrieve the first result
+              if (results[0]) {
+                // Open the infowindow indicating the elevation at the clicked position.
+                infowindow.setContent(
+                  "The elevation at this point <br>is " +
+                    results[0].elevation +
+                    " meters."
+                );
+              } else {
+                infowindow.setContent("No results found");
+              }
+            } else {
+              infowindow.setContent(
+                "Elevation service failed due to: " + status
+              );
+            }
+          }
+        );
+      }
+
+      /**
+       * Update a map's viewport to fit each geometry in a dataset
+       */
+      function zoom(map) {
+        const bounds = new google.maps.LatLngBounds();
+        map.data.forEach((feature) => {
+          const geometry = feature.getGeometry();
+
+          if (geometry) {
+            processPoints(geometry, bounds.extend, bounds);
+          }
+        });
+        map.fitBounds(bounds);
+      }
+
+      /**
+       * Process each point in a Geometry, regardless of how deep the points may lie.
+       */
+      function processPoints(geometry, callback, thisArg) {
+        if (geometry instanceof google.maps.LatLng) {
+          callback.call(thisArg, geometry);
+        } else if (geometry instanceof google.maps.Data.Point) {
+          callback.call(thisArg, geometry.get());
+        } else {
+          geometry.getArray().forEach((g) => {
+            processPoints(g, callback, thisArg);
+          });
+        }
+      }
+
+      /* DOM (drag/drop) functions */
+      function initEvents() {
+        [...document.getElementsByClassName("file")].forEach((fileElement) => {
+          fileElement.addEventListener(
+            "dragstart",
+            (e) => {
+              e.dataTransfer.setData(
+                "text/plain",
+                JSON.stringify(files[Number(e.target.dataset.value)])
+              );
+              console.log(e);
+            },
+            false
+          );
+        });
+        // set up the drag & drop events
+        const mapContainer = document.getElementById("map");
+        mapContainer.addEventListener("dragenter", addClassToDropTarget, false);
+        mapContainer.addEventListener("dragover", addClassToDropTarget, false);
+        mapContainer.addEventListener("drop", handleDrop, false);
+        mapContainer.addEventListener(
+          "dragleave",
+          removeClassFromDropTarget,
+          false
+        );
+      }
+
+      function addClassToDropTarget(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        document.getElementById("map").classList.add("over");
+        return false;
+      }
+
+      function removeClassFromDropTarget(e) {
+        document.getElementById("map").classList.remove("over");
+      }
+
+      function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeClassFromDropTarget(e);
+        const files = e.dataTransfer.files;
+
+        if (files.length) {
+          // process file(s) being dropped
+          // grab the file data from each file
+          for (let i = 0, file; (file = files[i]); i++) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+              loadGeoJsonString(reader.result);
+            };
+
+            reader.onerror = function (e) {
+              console.error("reading failed");
+            };
+            reader.readAsText(file);
+          }
+        } else {
+          // process non-file (e.g. text or html) content being dropped
+          // grab the plain text version of the data
+          const plainText = e.dataTransfer.getData("text/plain");
+          console.log(plainText);
+
+          if (plainText) {
+            loadGeoJsonString(plainText);
+          }
+        }
+        // prevent drag event from bubbling further
+        return false;
+      }
+
+      function initialize() {
+        initMap();
+        initEvents();
+      }
+      const files = [
+        {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "Polygon",
+                coordinates: [
+                  [
+                    [-99.49218749999999, -11.867350911459294],
+                    [24.960937499999996, -11.867350911459294],
+                    [24.960937499999996, 47.517200697839414],
+                    [-99.49218749999999, 47.517200697839414],
+                    [-99.49218749999999, -11.867350911459294],
+                  ],
+                ],
+              },
+            },
+          ],
+        },
+        {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "Point",
+                coordinates: [81.2109375, 50.064191736659104],
+              },
+            },
+            {
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "Point",
+                coordinates: [103.35937499999999, -47.98992166741417],
+              },
+            },
+            {
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "Point",
+                coordinates: [-46.05468749999999, 64.01449619484472],
+              },
+            },
+            {
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "Point",
+                coordinates: [-113.203125, 37.996162679728116],
+              },
+            },
+            {
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "Point",
+                coordinates: [-73.828125, -32.249974455863295],
+              },
+            },
+          ],
+        },
+        {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [147.65625, -5.266007882805485],
+                  [118.47656249999999, 43.83452678223682],
+                  [80.85937499999999, -30.145127183376115],
+                  [35.15625, 51.83577752045248],
+                  [-15.468749999999998, -23.563987128451217],
+                  [-29.53125, 44.33956524809713],
+                  [-73.47656249999999, -32.842673631954305],
+                  [-104.765625, 35.460669951495305],
+                ],
+              },
+            },
+          ],
+        },
+      ];
+    </script>
+  </head>
+  <body>
+    <img src="https://i.imgur.com/mXB985y.png" style="position:fixed; top:10px; right:10px; height:100px; border:none; margin:0; padding:10; overflow:hidden; z-index:99999;">
+    <img src="https://images.yourstory.com/cs/images/companies/DronaMaps-logo1-1603343546422.jpg" style="position:fixed; bottom:10px; right:10px; height:100px; border:none; margin:0; padding:10; overflow:hidden; z-index:99999;">
+<style>
+h1 {text-align: center;}
+p {text-align: center;}
+div {text-align: center;}
+</style>
+    <div id="container">
+      <div id="map"></div>
+      <div id="sidebar" class="mdc-typography">
+              <h3>Drag and Drop any of the files below onto the map.</h3>
+              <h4>You can also Drag and Drop a GeoJSON file from your computer. <br>Refresh page to remove current files.</h4>
+        <div class="file" draggable="true" data-value="0">
+          <span class="material-icons">text_snippet</span>
+          <div class="filename">polygons.geojson</div>
+        </div>
+        <div class="file" draggable="true" data-value="1">
+          <span class="material-icons">text_snippet</span>
+          <div class="filename">points.geojson</div>
+        </div>
+        <div class="file" draggable="true" data-value="2">
+          <span class="material-icons">text_snippet</span>
+          <div class="filename">polyline.geojson</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <!--<script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6Mde2FLVmUJMhrfQpddaAwo3O8idv9DE&callback=initMap&libraries=drawing&v=weekly"
+      async
+    ></script>-->
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6Mde2FLVmUJMhrfQpddaAwo3O8idv9DE&callback=initialize&libraries=drawing&v=weekly"
+      async
+    ></script>
+  </body>
+</html>
